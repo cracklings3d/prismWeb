@@ -7,11 +7,11 @@ import { StaticMeshSim } from './StaticMeshSim.ts'
 import { Check } from './Util.ts'
 
 class Engine {
-  public get world (): World {
+  public get world(): World {
     return this._world
   }
 
-  public get device (): GPUDevice {
+  public get device(): GPUDevice {
     return this._device
   }
 
@@ -27,7 +27,7 @@ class Engine {
   // private _simController: OrbitController | null = null;
   private _world: World = new World(this)
 
-  public constructor (Canvas: HTMLCanvasElement) {
+  public constructor(Canvas: HTMLCanvasElement) {
     this._canvas = Check(Canvas, 'Invalid canvas element')
 
     this._context = Check(
@@ -41,7 +41,7 @@ class Engine {
     })
   }
 
-  private async requestDevice () {
+  private async requestDevice() {
     const gpu = Check(navigator.gpu, 'This browser does not support WebGPU.')
     const adapter = Check(await gpu.requestAdapter(), 'No adapter found.')
 
@@ -58,7 +58,7 @@ class Engine {
     return device
   }
 
-  private async init () {
+  private async init() {
     this._device = await this.requestDevice()
 
     const contextConfig: GPUCanvasConfiguration = {
@@ -97,10 +97,11 @@ class Engine {
   }
 
   // TODO: Load world from file
-  private setupWorld () {
+  private setupWorld() {
     const staticMeshSim = new StaticMeshSim(this._world)
     staticMeshSim.setMesh(new StaticMesh())
     this._world.add(staticMeshSim)
+    this._renderer.loadWorld()
 
     // this._simController = new OrbitController();
     // this._simController.possess(this._world.view);
@@ -115,7 +116,7 @@ class Engine {
     // this._device.queue.writeBuffer(this._gameObjectMvpBuffer, 0, this.
   }
 
-  public async tick () {
+  public async tick() {
     const view = Check(this._world.view, 'No view found')
 
     view.setEyePosition(vec3d.create(0, 0, 5))
@@ -138,7 +139,7 @@ class Engine {
     this._device.queue.submit([commandBuffer])
   }
 
-  private renderLoop () {
+  private renderLoop() {
     const renderFrame = () => {
       this.tick()
       requestAnimationFrame(renderFrame)

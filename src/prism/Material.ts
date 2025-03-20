@@ -25,6 +25,8 @@ class ShaderModuleWithEntryPoint {
 
 // TODO: IMaterial
 class Material {
+  private static readonly VERTEX_FORMAT = 'float32x3';
+
   _device: GPUDevice;
 
   _vertexShaderModule: GPUShaderModule;
@@ -62,19 +64,19 @@ class Material {
     return new ShaderModuleWithEntryPoint(this._fragmentShaderModule, "fragmentMain");
   }
 
+  public getVertexComponentCount(): number {
+    // Extract component count from format (e.g., 'float32x3' -> 3)
+    return parseInt(Material.VERTEX_FORMAT.split('x')[1]);
+  }
+
   public getVertexLayout = () =>
-      new VertexLayout(12, [
-        {
-          shaderLocation: 0,
-          offset: 0,
-          format: 'float32x3'
-        }
-        // {
-        //   shaderLocation: 1,
-        //   offset: 12,
-        //   format: 'float32x4'
-        // }
-      ]);
+    new VertexLayout(Float32Array.BYTES_PER_ELEMENT * this.getVertexComponentCount(), [
+      {
+        shaderLocation: 0,
+        offset: 0,
+        format: Material.VERTEX_FORMAT
+      }
+    ]);
 
   public createPipeline(targetFormat: GPUTextureFormat) {
     const vertexShaderModule = this.vertexModule();

@@ -23,7 +23,7 @@ class Renderer {
   // _vertexData: Float32Array = new Float32Array();
   // _vertexDataByteLength = 0;
 
-  constructor (device: GPUDevice, context: GPUCanvasContext, world: World) {
+  constructor(device: GPUDevice, context: GPUCanvasContext, world: World) {
     this._device = device
     this._context = context
     this._world = world
@@ -36,11 +36,11 @@ class Renderer {
     this._material = new Material(this._device)
   }
 
-  public destroy () {
+  public destroy() {
     this._simMvpBuffer?.destroy()
   }
 
-  public loadWorld () {
+  public loadWorld() {
     this._simMvpBuffer = this._device.createBuffer({
       size: 64,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
@@ -69,7 +69,7 @@ class Renderer {
     }
   }
 
-  public render () {
+  public render() {
     const commandEncoder = this._device.createCommandEncoder()
     const currentTexture = this._context.getCurrentTexture()
     const textureView = currentTexture.createView()
@@ -93,7 +93,8 @@ class Renderer {
 
     for (const [_, vertexBuffer] of this._renderMap) {
       renderPass.setVertexBuffer(0, vertexBuffer)
-      renderPass.draw(vertexBuffer.size / 4)
+      const vertexCount = vertexBuffer.size / (Float32Array.BYTES_PER_ELEMENT * this._material.getVertexComponentCount())
+      renderPass.draw(vertexCount)
     }
 
     renderPass.end()
@@ -102,12 +103,12 @@ class Renderer {
     return commandBuffer
   }
 
-  public updateStaticMeshMvp (mvp: Mat4) {
+  public updateStaticMeshMvp(mvp: Mat4) {
     if (!this._simMvpBuffer) return
     this._device.queue.writeBuffer(this._simMvpBuffer, 0, mvp)
   }
 
-  public importRenderable (
+  public importRenderable(
     renderable: IRenderable,
     vertexDataByteLength: number,
     vertexData: Float32Array
